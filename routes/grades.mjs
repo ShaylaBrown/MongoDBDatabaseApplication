@@ -4,6 +4,21 @@ import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
+// Create a single grade entry
+router.post("/", async (req, res) => {
+  let collection = await db.collection("grades");
+  let newDocument = req.body;
+
+  // rename fields for backwards compatibility
+  if (newDocument.student_id) {
+    newDocument.learner_id = newDocument.student_id;
+    delete newDocument.student_id;
+  }
+
+  let result = await collection.insertOne(newDocument);
+  res.send(result).status(204);
+});
+
 // Get a single grade entry
 router.get("/:id", async (req, res) => {
   let collection = await db.collection("grades");
@@ -14,10 +29,15 @@ router.get("/:id", async (req, res) => {
   else res.send(result).status(200);
 });
 
-// Get a student's grade data
+// Student route for backwards compatibility
 router.get("/student/:id", async (req, res) => {
+  res.redirect(`../learner/${req.params.id}`);
+});
+
+// Get a learner's grade data
+router.get("/learner/:id", async (req, res) => {
   let collection = await db.collection("grades");
-  let query = { student_id: Number(req.params.id) };
+  let query = { learner_id: Number(req.params.id) };
   let result = await collection.find(query).toArray();
 
   if (!result) res.send("Not found").status(404);
