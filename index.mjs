@@ -1,21 +1,24 @@
 import express from "express";
-import cors from "cors";
-import "./loadEnvironment.mjs";
-import "express-async-errors";
-import posts from "./routes/posts.mjs";
+import dotenv from "dotenv";
+dotenv.config();
 
 const PORT = process.env.PORT || 5050;
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-// Load the /posts routes
-app.use("/posts", posts);
+app.get("/", (req, res) => {
+  res.send("Welcome to the API.");
+});
 
 // Global error handling
 app.use((err, _req, res, next) => {
-  res.status(500).send("Uh oh! An unexpected error occured.");
+  res.status(500).send("Seems like we messed up somewhere...");
+});
+
+// Start the Express server
+app.listen(PORT, () => {
+  console.log(`Server is running on port: ${PORT}`);
 });
 
 // start the Express server
